@@ -31,9 +31,19 @@
 
           <el-table-column prop="typeId" label="主键 " width="180"></el-table-column>
 
-          <el-table-column prop="type" label="属性类型 " width="180"></el-table-column>
 
-          <el-table-column prop="isSku" label="是否为SKU " width="180"></el-table-column>
+          <el-table-column label="属性类型">
+            <template slot-scope="scope">
+              {{ scope.row.type==1?"单选":scope.row.type==2?"多选":"复选" }}
+            </template>
+          </el-table-column>
+
+
+          <el-table-column label="是否为SKU">
+            <template slot-scope="scope">
+              {{ scope.row.isSku==1?"是":"不是" }}
+            </template>
+          </el-table-column>
 
           <el-table-column label="操作">
             <template slot-scope="scope">

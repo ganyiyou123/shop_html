@@ -37,11 +37,10 @@
 
           <el-table-column label="操作">
             <template slot-scope="scope">
-              <!--<el-button size="mini"  v-on:click="upshow(scope.$index, scope.row)">修改</el-button>-->
+              <el-button size="mini"  v-on:click="upshow(scope.$index, scope.row)">修改</el-button>
               <el-button size="mini" type="danger" v-on:click="del(scope.$index, scope.row)">删除</el-button>
             </template>
           </el-table-column>
-
         </el-table>
 
 
@@ -58,9 +57,7 @@
 
       <!--  新增的弹框   -->
       <el-dialog title="录入汽车信息" :visible.sync="addFormFlag" width="800px">
-
         <el-form :model="adddataForm" ref="adddataForm" :rules="rule"  label-width="80px">
-
           <el-form-item label="名称" prop="name">
             <el-input v-model="adddataForm.name" autocomplete="off" ></el-input>
           </el-form-item>
@@ -94,6 +91,52 @@
 
       </el-dialog>
 
+      <!-- 修改的弹框   -->
+      <el-dialog title="修改汽车信息" :visible.sync="upFormFlag" width="800px">
+
+        <el-form :model="updataForm" ref="updataForm" :rules="rule"  label-width="80px">
+
+          <el-form-item label="序号" prop="id">
+            <el-input v-model="updataForm.id" autocomplete="off" readonly=""></el-input>
+          </el-form-item>
+
+          <el-form-item label="名称" prop="name">
+            <el-input v-model="updataForm.name" autocomplete="off" ></el-input>
+          </el-form-item>
+
+          <el-form-item label="中午名称" prop="nameCH">
+            <el-input v-model="updataForm.nameCH" autocomplete="off" ></el-input>
+          </el-form-item>
+
+          <el-form-item label="主键" prop="typeId">
+            <el-input v-model="updataForm.typeId" autocomplete="off" ></el-input>
+          </el-form-item>
+
+
+          <el-form-item label="属性类型" prop="type">
+            <el-radio-group v-model="updataForm.type">
+              <el-radio :label="1">单选</el-radio>
+              <el-radio :label="2">多选</el-radio>
+              <el-radio :label="3">复选</el-radio>
+            </el-radio-group>
+          </el-form-item>
+
+          <el-form-item label="是否为SKU" prop="isSku">
+            <el-radio-group v-model="updataForm.isSku">
+              <el-radio :label="1">是</el-radio>
+              <el-radio :label="2">不是</el-radio>
+            </el-radio-group>
+          </el-form-item>
+
+
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="upFormFlag = false">取 消</el-button>
+          <el-button type="primary" @click="upForm">确 定</el-button>
+        </div>
+
+      </el-dialog>
+
 
     </div>
 </template>
@@ -103,6 +146,16 @@
         name: "Data",
       data(){
           return{
+            /* 修改相关的数据  */
+            upFormFlag:false,
+            updataForm:{
+              id:"",
+              name:"",
+              nameCH:"",
+              typeId:"",
+              type:"",
+              isSku:""
+            },
             /* 新增相关的数据  */
             addFormFlag:false,
             adddataForm:{
@@ -127,13 +180,30 @@
             sizes:[2,3,5,10],
             size:2,
             /*条件查询*/
-            searchForm:{
-              name:""
-            }
+            searchForm:{ name:""}
           }
       },created:function(){
         this.queryData(1);
       },methods:{
+        upshow:function(index,row){//修改
+          this.upFormFlag=true;
+          this.$ajax.get("http://localhost:8080/api/data/upShowData?id="+row.id).then(rs=>{
+            var updata=rs.data.data;
+            this.updataForm.id=updata.id;
+            this.updataForm.name=updata.name;
+            this.updataForm.nameCH=updata.nameCH;
+            this.updataForm.typeId=updata.typeId;
+            this.updataForm.type=updata.type;
+            this.updataForm.isSku=updata.isSku;
+          }).catch(err=>console.log(err))
+
+     },upForm:function(){
+          //发送请求
+          this.$ajax.post("http://localhost:8080/api/data/updateDatas",this.$qs.stringify(this.updataForm)).then(res=>{
+            this.upFormFlag=false;
+            this.queryData(1);
+          }).catch(err=>console.log(err));
+        },
         //删除
         del:function(index,row){
           this.$ajax.delete("http://localhost:8080/api/data/dleDatasByid?id="+row.id).then(res=>{

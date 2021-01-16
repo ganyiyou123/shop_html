@@ -72,7 +72,7 @@
             <el-input v-model="adddataForm.name" autocomplete="off" ></el-input>
           </el-form-item>
 
-          <el-form-item label="中午名称" prop="nameCH">
+          <el-form-item label="中文名称" prop="nameCH">
             <el-input v-model="adddataForm.nameCH" autocomplete="off" ></el-input>
           </el-form-item>
 
@@ -81,11 +81,20 @@
           </el-form-item>
 
           <el-form-item label="属性类型" prop="type">
-            <el-input v-model="adddataForm.type" autocomplete="off" ></el-input>
+            <el-radio-group v-model="adddataForm.type">
+              <el-radio label="1">单选</el-radio>
+              <el-radio label="2">多选</el-radio>
+              <el-radio label="2">复选</el-radio>
+            </el-radio-group>
           </el-form-item>
 
+
+
           <el-form-item label="是否为SKU" prop="isSku">
-            <el-input v-model="adddataForm.isSku" autocomplete="off" ></el-input>
+            <el-radio-group v-model="adddataForm.isSku">
+              <el-radio label="1">是</el-radio>
+              <el-radio label="2">不是</el-radio>
+            </el-radio-group>
           </el-form-item>
 
           <el-form-item label="创建人" prop="createPeople">
@@ -114,7 +123,7 @@
             <el-input v-model="updataForm.name" autocomplete="off" ></el-input>
           </el-form-item>
 
-          <el-form-item label="中午名称" prop="nameCH">
+          <el-form-item label="中文名称" prop="nameCH">
             <el-input v-model="updataForm.nameCH" autocomplete="off" ></el-input>
           </el-form-item>
 

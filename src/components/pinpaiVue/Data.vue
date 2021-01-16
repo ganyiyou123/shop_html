@@ -38,7 +38,7 @@
           <el-table-column label="操作">
             <template slot-scope="scope">
               <!--<el-button size="mini"  v-on:click="upshow(scope.$index, scope.row)">修改</el-button>-->
-              <!--<el-button size="mini" type="danger" v-on:click="del(scope.$index, scope.row)">删除</el-button>-->
+              <el-button size="mini" type="danger" v-on:click="del(scope.$index, scope.row)">删除</el-button>
             </template>
           </el-table-column>
 
@@ -134,6 +134,12 @@
       },created:function(){
         this.queryData(1);
       },methods:{
+        //删除
+        del:function(index,row){
+          this.$ajax.delete("http://localhost:8080/api/data/dleDatasByid?id="+row.id).then(res=>{
+            this.queryData(1);
+          }).catch(err=>console.log(err))
+        },
         addForm:function(){//新增
           this.$refs['adddataForm'].validate(res=>{
             if(res==true){

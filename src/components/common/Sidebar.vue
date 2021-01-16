@@ -72,6 +72,9 @@ export default {
                   },{
                     index: 'Pinpai',
                     title: '品牌管理'
+                  },{
+                    index: 'Data',
+                    title: '属性管理'
                   }]
               },
                 {

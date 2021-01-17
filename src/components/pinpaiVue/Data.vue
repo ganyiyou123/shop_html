@@ -29,7 +29,14 @@
 
           <el-table-column prop="nameCH" label="中文名称" width="80"></el-table-column>
 
-          <el-table-column prop="typeId" label="主键 " width="80"></el-table-column>
+          <el-table-column
+            prop="typeId"
+            label="商品类型"
+            :formatter="changetypeId"
+            width="80"
+          >
+          </el-table-column>
+
 
 
           <el-table-column label="属性类型" width="80">
@@ -47,7 +54,7 @@
 
           <el-table-column label="操作">
             <template slot-scope="scope">
-              <el-button size="mini"  v-on:click="weihu()">属性值维护</el-button>
+              <el-button size="mini"  v-on:click="weihu(scope.row)">属性值维护</el-button>
               <el-button size="mini"  v-on:click="upshow(scope.$index, scope.row)">修改</el-button>
               <el-button size="mini" type="danger" v-on:click="del(scope.$index, scope.row)">删除</el-button>
             </template>
@@ -179,7 +186,9 @@
 
           <el-table-column prop="id" align="center" label="序号" width="180"></el-table-column>
 
-          <el-table-column prop="name" label="名称" width="180"></el-table-column>
+          <el-table-column prop="nameCH" label="属性名称" width="180"></el-table-column>
+
+          <el-table-column prop="dataName"  label="属性值名称" width="180"></el-table-column>
 
           <el-table-column label="操作">
             <template slot-scope="scope">
@@ -202,6 +211,7 @@
       data(){
           return{
             /*属性值的查询数据*/
+
             dataValue:false,
             valueData:{},
 
@@ -247,9 +257,20 @@
         this.queryData(1);
         this.getTypeData()
       },methods:{
-          //属性维护
-        weihu:function(){
+          //属性值维护
+        weihu:function(row){
+          this.$ajax.get("http://localhost:8080/api/datavalue/getvalueData?dataId="+row.id).then(rs=>{
+            for (let i = 0; i <rs.data.data.length ; i++) {
+              rs.data.data[i].dataName=row.nameCH;
+            }
+
+            this.valueData=rs.data.data;
+            console.log(row.id);
+            console.log(rs);
+          }).catch(err=>console.log(err))
+
           this.dataValue=true;
+
         },
 
         upshow:function(index,row){//修改
@@ -340,7 +361,7 @@
         changetypeId:function (row, column) {
           for (let i = 0; i <this.TypeData.length ; i++) {
             if (row.typeId==this.TypeData[i].id){
-              return this.TypeData[i].name
+              return this.TypeData[i].name;
             }
           }
           return "未知"

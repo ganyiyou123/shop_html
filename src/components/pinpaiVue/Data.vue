@@ -182,7 +182,10 @@
 
       <!--属性值的查询-->
       <el-dialog title="属性值维护表" :visible.sync="dataValue" width="800px">
+        <el-button size="mini"  v-on:click="addvalueFlag=true">新增</el-button>
+
         <el-table :data="valueData" border style="width: 100%">
+
 
           <el-table-column prop="id" align="center" label="序号" width="180"></el-table-column>
 
@@ -192,7 +195,7 @@
 
           <el-table-column label="操作">
             <template slot-scope="scope">
-              <el-button size="mini"  v-on:click="addvalueFlag=true">新增</el-button>
+
               <el-button size="mini"  v-on:click="upvalue(scope.row)">修改</el-button>
               <el-button size="mini" type="danger" v-on:click="delvalue(scope.row)">删除</el-button>
             </template>
@@ -253,6 +256,7 @@
         name: "Data",
       data(){
           return{
+            row:{},
             /*属性值的修改数据*/
             upvalueFlag:false,
             upvalueForm:{
@@ -344,11 +348,12 @@
           this.$ajax.post("http://localhost:8080/api/datavalue/addvalueData",this.$qs.stringify(this.addvalueForm)).then(rs=>{
             //关闭弹框
             this.addvalueFlag=false;
-
+            this.weihu(this.row);
           }).catch(err=>console.log(err))
         },
 
         weihu:function(row){//属性值查询
+          this.row=row;
           this.$ajax.get("http://localhost:8080/api/datavalue/getvalueData?dataId="+row.id).then(rs=>{
             for (let i = 0; i <rs.data.data.length ; i++) {
               rs.data.data[i].dataName=row.nameCH;
@@ -357,7 +362,7 @@
             this.valueData=rs.data.data;
             console.log(row.id);
             console.log(rs);
-          }).catch(err=>console.log(err))
+          }).catch(err=>console.log(err));
 
           this.dataValue=true;
 

@@ -192,12 +192,55 @@
 
           <el-table-column label="操作">
             <template slot-scope="scope">
-              <!--<el-button size="mini"  v-on:click="weihu()">属性值维护</el-button>
-              <el-button size="mini"  v-on:click="upshow(scope.$index, scope.row)">修改</el-button>
-              <el-button size="mini" type="danger" v-on:click="del(scope.$index, scope.row)">删除</el-button>-->
+              <el-button size="mini"  v-on:click="addvalueFlag=true">新增</el-button>
+              <el-button size="mini"  v-on:click="upvalue(scope.row)">修改</el-button>
+              <el-button size="mini" type="danger" v-on:click="delvalue(scope.row)">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
+
+      </el-dialog>
+
+      <!--  新增的弹框   -->
+      <el-dialog title="录入信息" :visible.sync="addvalueFlag" width="800px">
+        <el-form :model="addvalueForm" ref="addvalueForm" :rules="rule"  label-width="80px">
+          <el-form-item label="名称" prop="name">
+            <el-input v-model="addvalueForm.name" autocomplete="off" ></el-input>
+          </el-form-item>
+
+          <el-form-item label="中文名称" prop="nameCH">
+            <el-input v-model="addvalueForm.nameCH" autocomplete="off" ></el-input>
+          </el-form-item>
+
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="addvalueFlag = false">取 消</el-button>
+          <el-button type="primary" @click="addvalue">确 定</el-button>
+        </div>
+
+      </el-dialog>
+
+      <!--  修改的弹框   -->
+      <el-dialog title="录入信息" :visible.sync="upvalueFlag" width="800px">
+        <el-form :model="upvalueForm" ref="upvalueForm" :rules="rule"  label-width="80px">
+
+          <el-form-item label="序号" prop="id">
+            <el-input v-model="upvalueForm.id" autocomplete="off" ></el-input>
+          </el-form-item>
+
+          <el-form-item label="名称" prop="name">
+            <el-input v-model="upvalueForm.name" autocomplete="off" ></el-input>
+          </el-form-item>
+
+          <el-form-item label="中文名称" prop="nameCH">
+            <el-input v-model="upvalueForm.nameCH" autocomplete="off" ></el-input>
+          </el-form-item>
+
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="upvalueFlag = false">取 消</el-button>
+          <el-button type="primary" @click="upvaluedatas">确 定</el-button>
+        </div>
 
       </el-dialog>
 
@@ -210,8 +253,22 @@
         name: "Data",
       data(){
           return{
-            /*属性值的查询数据*/
+            /*属性值的修改数据*/
+            upvalueFlag:false,
+            upvalueForm:{
+              id:"",
+              name:"",
+              nameCH:""
+            },
+            /*属性值的新增数据*/
+            addvalueFlag:false,
+            addvalueForm:{
+              name:"",
+              nameCH:""
+            },
 
+
+            /*属性值的查询数据*/
             dataValue:false,
             valueData:{},
 
@@ -257,8 +314,41 @@
         this.queryData(1);
         this.getTypeData()
       },methods:{
-          //属性值维护
-        weihu:function(row){
+          //属性值删除
+        delvalue:function(row){
+          this.$ajax.post("http://localhost:8080/api/datavalue/delvalueData?id="+row.id).then(rs=>{
+
+          }).catch(err=>console.log(err))
+        },
+          //属性值修改
+        upvalue:function(row){
+          this.upvalueFlag=true;
+          this.$ajax.get("http://localhost:8080/api/datavalue/upShowvalueData?id="+row.id).then(rs=>{
+            var upvdata=rs.data.data;
+            console.log(rs);
+            this.upvalueForm.id=upvdata.id;
+            this.upvalueForm.name=upvdata.name;
+            this.upvalueForm.nameCH=upvdata.nameCH;
+
+          }).catch(err=>console.log(err))
+        },upvaluedatas:function(){
+          //发送请求
+          this.$ajax.post("http://localhost:8080/api/datavalue/upvalueData",this.$qs.stringify(this.upvalueForm)).then(res=>{
+            this.upvalueFlag=false;
+
+          }).catch(err=>console.log(err));
+        },
+          //属性值新增
+        addvalue:function(){//新增
+          this.addvalueForm.dataId=this.valueData[0].dataId;
+          this.$ajax.post("http://localhost:8080/api/datavalue/addvalueData",this.$qs.stringify(this.addvalueForm)).then(rs=>{
+            //关闭弹框
+            this.addvalueFlag=false;
+
+          }).catch(err=>console.log(err))
+        },
+
+        weihu:function(row){//属性值查询
           this.$ajax.get("http://localhost:8080/api/datavalue/getvalueData?dataId="+row.id).then(rs=>{
             for (let i = 0; i <rs.data.data.length ; i++) {
               rs.data.data[i].dataName=row.nameCH;

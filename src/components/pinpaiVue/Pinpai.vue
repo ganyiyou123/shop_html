@@ -38,7 +38,7 @@
         <!-- 按文本处理   :formatter="formatImg"    -->
         <!-- 模板处理  html  -->
         <template slot-scope="scope">
-          <img width="50px" :src="'http://'+scope.row.imgPath"/>
+          <img width="50px" :src="scope.row.imgPath">
         </template>
       </el-table-column>
 
@@ -145,7 +145,7 @@
 
 
           <el-form-item label="图片">
-            <img width="50px" :src="'http://'+uppinpaiForm.imgPath"/>
+            <img width="50px" :src="uppinpaiForm.imgPath"/>
             <el-upload
               class="upload-demo"
               action="http://localhost:8080/api/pinpai/uploadFile"

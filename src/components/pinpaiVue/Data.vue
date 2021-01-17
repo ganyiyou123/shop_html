@@ -23,23 +23,23 @@
       <div id="dataTable">
         <el-table :data="dataData" border style="width: 100%">
 
-          <el-table-column prop="id" align="center" label="序号" width="180"></el-table-column>
+          <el-table-column prop="id" align="center" label="序号" width="80"></el-table-column>
 
-          <el-table-column prop="name" label="名称" width="180"></el-table-column>
+          <el-table-column prop="name" label="名称" width="80"></el-table-column>
 
-          <el-table-column prop="nameCH" label="中文名称" width="180"></el-table-column>
+          <el-table-column prop="nameCH" label="中文名称" width="80"></el-table-column>
 
-          <el-table-column prop="typeId" label="主键 " width="180"></el-table-column>
+          <el-table-column prop="typeId" label="主键 " width="80"></el-table-column>
 
 
-          <el-table-column label="属性类型">
+          <el-table-column label="属性类型" width="80">
             <template slot-scope="scope">
               {{ scope.row.type==1?"单选":scope.row.type==2?"多选":"复选" }}
             </template>
           </el-table-column>
 
 
-          <el-table-column label="是否为SKU">
+          <el-table-column label="是否为SKU" width="100">
             <template slot-scope="scope">
               {{ scope.row.isSku==1?"是":"不是" }}
             </template>
@@ -47,6 +47,7 @@
 
           <el-table-column label="操作">
             <template slot-scope="scope">
+              <el-button size="mini"  v-on:click="weihu()">属性值维护</el-button>
               <el-button size="mini"  v-on:click="upshow(scope.$index, scope.row)">修改</el-button>
               <el-button size="mini" type="danger" v-on:click="del(scope.$index, scope.row)">删除</el-button>
             </template>
@@ -66,7 +67,7 @@
       </div >
 
       <!--  新增的弹框   -->
-      <el-dialog title="录入汽车信息" :visible.sync="addFormFlag" width="800px">
+      <el-dialog title="录入信息" :visible.sync="addFormFlag" width="800px">
         <el-form :model="adddataForm" ref="adddataForm" :rules="rule"  label-width="80px">
           <el-form-item label="名称" prop="name">
             <el-input v-model="adddataForm.name" autocomplete="off" ></el-input>
@@ -76,8 +77,19 @@
             <el-input v-model="adddataForm.nameCH" autocomplete="off" ></el-input>
           </el-form-item>
 
-          <el-form-item label="主键" prop="typeId">
+          <!--<el-form-item label="主键" prop="typeId">
             <el-input v-model="adddataForm.typeId" autocomplete="off" ></el-input>
+          </el-form-item>-->
+
+          <el-form-item label="商品类型" prop="typeId">
+            <el-select v-model="adddataForm.typeId" placeholder="请选择">
+              <el-option
+                v-for="item in TypeDatas"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id">
+              </el-option>
+            </el-select>
           </el-form-item>
 
           <el-form-item label="属性类型" prop="type">
@@ -111,7 +123,7 @@
       </el-dialog>
 
       <!-- 修改的弹框   -->
-      <el-dialog title="修改汽车信息" :visible.sync="upFormFlag" width="800px">
+      <el-dialog title="修改信息" :visible.sync="upFormFlag" width="800px">
 
         <el-form :model="updataForm" ref="updataForm" :rules="rule"  label-width="80px">
 
@@ -127,9 +139,13 @@
             <el-input v-model="updataForm.nameCH" autocomplete="off" ></el-input>
           </el-form-item>
 
-          <el-form-item label="主键" prop="typeId">
+          <!--<el-form-item label="主键" prop="typeId">
             <el-input v-model="updataForm.typeId" autocomplete="off" ></el-input>
-          </el-form-item>
+          </el-form-item>-->
+
+          <el-table-column prop="typeId" label="商品类型" :formatter="changetypeId">
+
+          </el-table-column>
 
 
           <el-form-item label="属性类型" prop="type">
@@ -157,6 +173,26 @@
       </el-dialog>
 
 
+      <!--属性值的查询-->
+      <el-dialog title="属性值维护表" :visible.sync="dataValue" width="800px">
+        <el-table :data="valueData" border style="width: 100%">
+
+          <el-table-column prop="id" align="center" label="序号" width="180"></el-table-column>
+
+          <el-table-column prop="name" label="名称" width="180"></el-table-column>
+
+          <el-table-column label="操作">
+            <template slot-scope="scope">
+              <!--<el-button size="mini"  v-on:click="weihu()">属性值维护</el-button>
+              <el-button size="mini"  v-on:click="upshow(scope.$index, scope.row)">修改</el-button>
+              <el-button size="mini" type="danger" v-on:click="del(scope.$index, scope.row)">删除</el-button>-->
+            </template>
+          </el-table-column>
+        </el-table>
+
+      </el-dialog>
+
+
     </div>
 </template>
 
@@ -165,6 +201,11 @@
         name: "Data",
       data(){
           return{
+            /*属性值的查询数据*/
+            dataValue:false,
+            valueData:{},
+
+            TypeData:[],
             /* 修改相关的数据  */
             upFormFlag:false,
             updataForm:{
@@ -177,6 +218,7 @@
             },
             /* 新增相关的数据  */
             addFormFlag:false,
+            TypeDatas:[],
             adddataForm:{
               name:"",
               nameCH:"",
@@ -203,7 +245,13 @@
           }
       },created:function(){
         this.queryData(1);
+        this.getTypeData()
       },methods:{
+          //属性维护
+        weihu:function(){
+          this.dataValue=true;
+        },
+
         upshow:function(index,row){//修改
           this.upFormFlag=true;
           this.$ajax.get("http://localhost:8080/api/data/upShowData?id="+row.id).then(rs=>{
@@ -253,7 +301,51 @@
         },handleSizeChange:function(size){ //跳转页面
           this.size=size;
           this.queryData(1);
+        },
+
+        //类型查询
+        getTypeData:function () {
+          this.$ajax.get("http://localhost:8080/api/type/getData").then(res=>{
+            //console.log(res)
+            this.TypeData=res.data.data;
+            this.getTypeDatas()
+          }).catch(err=>console.log(err))
+        },getTypeDatas(){
+          for (var i = 0; i <this.TypeData.length ; i++) {
+            //var xiala="";
+            var ps  =this.isParent(this.TypeData[i]);
+            var ss  =this.isSon(this.TypeData[i]);
+            var xx="";
+            if (ps==true){
+              this.TypeDatas.push(this.TypeData[i]);
+            }
+          }
+        },isParent:function (datas) {//判断是否为父节点
+          for (let i = 0; i <this.TypeData.length ; i++) {
+            if (datas.id ==this.TypeData[i].pid) {
+              return true
+            }
+          }
+
+          return false
+        },isSon:function(datas){//判断是否为子节点
+          for (let i = 0; i <this.TypeData.length ; i++) {
+            if(datas.pid==this.TypeData[i].id){
+              return true;
+            }
+          }
+          return false;
+        },
+        //查询的类型转换
+        changetypeId:function (row, column) {
+          for (let i = 0; i <this.TypeData.length ; i++) {
+            if (row.typeId==this.TypeData[i].id){
+              return this.TypeData[i].name
+            }
+          }
+          return "未知"
         }
+
       }
     }
 </script>

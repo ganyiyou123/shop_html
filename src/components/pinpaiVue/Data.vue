@@ -33,7 +33,7 @@
             prop="typeId"
             label="商品类型"
             :formatter="changetypeId"
-            width="80"
+            width="220"
           >
           </el-table-column>
 
@@ -84,17 +84,10 @@
             <el-input v-model="adddataForm.nameCH" autocomplete="off" ></el-input>
           </el-form-item>
 
-          <!--<el-form-item label="主键" prop="typeId">
-            <el-input v-model="adddataForm.typeId" autocomplete="off" ></el-input>
-          </el-form-item>-->
 
           <el-form-item label="商品类型" prop="typeId">
             <el-select v-model="adddataForm.typeId" placeholder="请选择">
-              <el-option
-                v-for="item in TypeDatas"
-                :key="item.id"
-                :label="item.name"
-                :value="item.id">
+              <el-option v-for="item in TypeDatas" :key="item.id" :label="item.name" :value="item.id">
               </el-option>
             </el-select>
           </el-form-item>
@@ -146,9 +139,6 @@
             <el-input v-model="updataForm.nameCH" autocomplete="off" ></el-input>
           </el-form-item>
 
-          <!--<el-form-item label="主键" prop="typeId">
-            <el-input v-model="updataForm.typeId" autocomplete="off" ></el-input>
-          </el-form-item>-->
 
           <el-form-item label="商品类型" prop="typeId">
             <el-select v-model="updataForm.typeId" placeholder="请选择">
@@ -316,6 +306,8 @@
             /* 新增相关的数据  */
             addFormFlag:false,
             TypeDatas:[],
+            types:[],
+            typename:"",
             adddataForm:{
               name:"",
               nameCH:"",
@@ -457,44 +449,63 @@
           this.queryData(1);
         },
 
-        //类型查询
+        //类型数据查询
         getTypeData:function () {
           this.$ajax.get("http://localhost:8080/api/type/getData").then(res=>{
             //console.log(res)
-            this.TypeData=res.data.data;
-            this.getTypeDatas()
-          }).catch(err=>console.log(err))
-        },getTypeDatas(){
-          for (var i = 0; i <this.TypeData.length ; i++) {
-            //var xiala="";
-            var ps  =this.isParent(this.TypeData[i]);
-            var ss  =this.isSon(this.TypeData[i]);
-            var xx="";
-            if (ps==true){
-              this.TypeDatas.push(this.TypeData[i]);
-            }
-          }
-        },isParent:function (datas) {//判断是否为父节点
-          for (let i = 0; i <this.TypeData.length ; i++) {
-            if (datas.id ==this.TypeData[i].pid) {
-              return true
-            }
-          }
+            this.types=res.data.data;
 
-          return false
-        },isSon:function(datas){//判断是否为子节点
-          for (let i = 0; i <this.TypeData.length ; i++) {
-            if(datas.pid==this.TypeData[i].id){
-              return true;
+            this.getTypeDatas();
+
+            //遍历所有的子节点
+            for (let i = 0; i <this.TypeDatas.length ; i++) {
+              this.typename="";//全局 零时存值
+              this.gettypeName(this.TypeDatas[i]);
+              this.TypeDatas[i].name=this.typename.split("/").reverse().join("/").substring(0,this.typename.length-1);
+            }
+
+          }).catch(err=>console.log(err))
+        },
+        //获取节点的name
+        gettypeName:function(node){
+          if(node.pid!=0){
+            this.typename+="/"+node.name;
+            //获取上级节点
+            for (let i = 0; i <this.types.length ; i++) {
+              if(node.pid==this.types[i].id){
+                this.gettypeName(this.types[i]);
+                break;
+              }
+            }
+          }else{
+            this.typename+="/"+node.name;
+          }
+        },
+        //获取所有节点数据
+        getTypeDatas(){
+          for (let i = 0; i <this.types.length ; i++) {
+            let node=this.types[i];//{"id":7,name:"分类/电子产品/手机"},
+            this.isSon(node)
+          }
+        },
+        //判断是否为子节点
+        isSon:function(node){
+          let rs=true;//表实这个节点为子节点
+          for (let i = 0; i <this.types.length ; i++) {
+            if(node.id==this.types[i].pid){//1  0
+              rs=false;
+              break;
             }
           }
-          return false;
+          if(rs==true){
+            this.TypeDatas.push(node);
+          }
         },
         //查询的类型转换
         changetypeId:function (row, column) {
-          for (let i = 0; i <this.TypeData.length ; i++) {
-            if (row.typeId==this.TypeData[i].id){
-              return this.TypeData[i].name;
+          for (let i = 0; i <this.types.length ; i++) {
+            if (row.typeId==this.types[i].id){
+              return this.types[i].name;
             }
           }
           return "未知"

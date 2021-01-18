@@ -12,7 +12,7 @@
 
           <el-form-item>
             <el-button type="primary" @click="queryData(1)">查询</el-button>
-            <el-button type="success" @click="addFormFlag=true">新增</el-button>
+            <el-button type="success" icon="el-icon-circle-plus-outline"  @click="addFormFlag=true"></el-button>
           </el-form-item>
 
 
@@ -54,9 +54,9 @@
 
           <el-table-column label="操作">
             <template slot-scope="scope">
-              <el-button size="mini"  v-on:click="weihu(scope.row)">属性值维护</el-button>
-              <el-button size="mini"  v-on:click="upshow(scope.$index, scope.row)">修改</el-button>
-              <el-button size="mini" type="danger" v-on:click="del(scope.$index, scope.row)">删除</el-button>
+              <el-button size="mini" type="warning"  v-on:click="weihu(scope.row)">属性值维护</el-button>
+              <el-button size="mini" icon="el-icon-edit" type="success"  v-on:click="upshow(scope.$index, scope.row)">修改</el-button>
+              <el-button size="mini" icon="el-icon-delete" type="danger" v-on:click="del(scope.$index, scope.row)"></el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -103,7 +103,7 @@
             <el-radio-group v-model="adddataForm.type">
               <el-radio label="1">单选</el-radio>
               <el-radio label="2">多选</el-radio>
-              <el-radio label="2">复选</el-radio>
+              <el-radio label="3">复选</el-radio>
             </el-radio-group>
           </el-form-item>
 
@@ -150,6 +150,17 @@
             <el-input v-model="updataForm.typeId" autocomplete="off" ></el-input>
           </el-form-item>-->
 
+          <el-form-item label="商品类型" prop="typeId">
+            <el-select v-model="updataForm.typeId" placeholder="请选择">
+              <el-option
+                v-for="item in TypeDatas"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id">
+              </el-option>
+            </el-select>
+          </el-form-item>
+
           <el-table-column prop="typeId" label="商品类型" :formatter="changetypeId">
 
           </el-table-column>
@@ -181,8 +192,8 @@
 
 
       <!--属性值的查询-->
-      <el-dialog title="属性值维护表" :visible.sync="dataValue" width="800px">
-        <el-button size="mini"  v-on:click="addvalueFlag=true">新增</el-button>
+      <el-dialog :title="valueTitle" :visible.sync="dataValue" width="800px">
+        <el-button size="mini" type="danger" icon="el-icon-circle-plus-outline"  v-on:click="addvalueFlag=true"></el-button>
 
         <el-table :data="valueData" border style="width: 100%">
 
@@ -196,7 +207,7 @@
           <el-table-column label="操作">
             <template slot-scope="scope">
 
-              <el-button size="mini"  v-on:click="upvalue(scope.row)">修改</el-button>
+              <el-button size="mini" type="danger"  v-on:click="upvalue(scope.row)">修改</el-button>
               <el-button size="mini" type="danger" v-on:click="delvalue(scope.row)">删除</el-button>
             </template>
           </el-table-column>
@@ -205,8 +216,8 @@
       </el-dialog>
 
       <!--  新增的弹框   -->
-      <el-dialog title="录入信息" :visible.sync="addvalueFlag" width="800px">
-        <el-form :model="addvalueForm" ref="addvalueForm" :rules="rule"  label-width="80px">
+      <el-dialog title="录入信息" :visible.sync="addvalueFlag"  width="800px">
+        <el-form :model="addvalueForm" ref="addvalueForm" :rules="rule"   label-width="80px">
           <el-form-item label="名称" prop="name">
             <el-input v-model="addvalueForm.name" autocomplete="off" ></el-input>
           </el-form-item>
@@ -224,7 +235,7 @@
       </el-dialog>
 
       <!--  修改的弹框   -->
-      <el-dialog title="录入信息" :visible.sync="upvalueFlag" width="800px">
+      <el-dialog :title="upvaluetitle" :visible.sync="upvalueFlag" width="800px">
         <el-form :model="upvalueForm" ref="upvalueForm" :rules="rule"  label-width="80px">
 
           <el-form-item label="序号" prop="id">
@@ -258,6 +269,7 @@
           return{
             row:{},
             /*属性值的修改数据*/
+            upvaluetitle:"",
             upvalueFlag:false,
             upvalueForm:{
               id:"",
@@ -266,13 +278,26 @@
             },
             /*属性值的新增数据*/
             addvalueFlag:false,
+            abc:"",
             addvalueForm:{
               name:"",
               nameCH:""
             },
+            rule:{ //属性新增验证规则
+              name:[
+                { required: true, message: '请输入名称', trigger: 'blur' },
+                { min: 2, max: 15, message: '长度在 2 到 15 个字符', trigger: 'blur' }
+              ],
+              nameCH:[
+                { required: true, message: '请输入名称', trigger: 'blur' },
+                { min: 2, max: 15, message: '长度在 2 到 15 个字符', trigger: 'blur' }
+              ]
+
+            },
 
 
             /*属性值的查询数据*/
+            valueTitle:"",
             dataValue:false,
             valueData:{},
 
@@ -287,6 +312,7 @@
               type:"",
               isSku:""
             },
+
             /* 新增相关的数据  */
             addFormFlag:false,
             TypeDatas:[],
@@ -298,8 +324,12 @@
               isSku:"",
               createPeople:""
             },
-            rule:{ //验证规则
+            rule:{ //属性新增验证规则
               name:[
+                { required: true, message: '请输入名称', trigger: 'blur' },
+                { min: 2, max: 15, message: '长度在 2 到 15 个字符', trigger: 'blur' }
+              ],
+              nameCH:[
                 { required: true, message: '请输入名称', trigger: 'blur' },
                 { min: 2, max: 15, message: '长度在 2 到 15 个字符', trigger: 'blur' }
               ]
@@ -327,6 +357,7 @@
           //属性值修改
         upvalue:function(row){
           this.upvalueFlag=true;
+          this.upvaluetitle=row.nameCH+"的修改信息";
           this.$ajax.get("http://localhost:8080/api/datavalue/upShowvalueData?id="+row.id).then(rs=>{
             var upvdata=rs.data.data;
             console.log(rs);
@@ -344,16 +375,23 @@
         },
           //属性值新增
         addvalue:function(){//新增
-          this.addvalueForm.dataId=this.valueData[0].dataId;
-          this.$ajax.post("http://localhost:8080/api/datavalue/addvalueData",this.$qs.stringify(this.addvalueForm)).then(rs=>{
-            //关闭弹框
-            this.addvalueFlag=false;
-            this.weihu(this.row);
-          }).catch(err=>console.log(err))
+          this.addvalueForm.dataId=this.abc;
+          this.$refs["addvalueForm"].validate(res=>{
+            if(res==true){
+              this.$ajax.post("http://localhost:8080/api/datavalue/addvalueData",this.$qs.stringify(this.addvalueForm)).then(rs=>{
+                //关闭弹框
+                this.addvalueFlag=false;
+                this.weihu(this.row);
+              }).catch(err=>console.log(err))
+            }
+
+          })
         },
 
         weihu:function(row){//属性值查询
+          this.abc=row.id;
           this.row=row;
+          this.valueTitle=row.nameCH+"的选项信息";
           this.$ajax.get("http://localhost:8080/api/datavalue/getvalueData?dataId="+row.id).then(rs=>{
             for (let i = 0; i <rs.data.data.length ; i++) {
               rs.data.data[i].dataName=row.nameCH;

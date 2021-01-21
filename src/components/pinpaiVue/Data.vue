@@ -41,7 +41,7 @@
 
           <el-table-column label="属性类型" width="80">
             <template slot-scope="scope">
-              {{ scope.row.type==1?"单选":scope.row.type==2?"多选":"复选" }}
+              {{ scope.row.type==1?"单选":scope.row.type==2?"多选":scope.row.type==3?"下拉":"文本" }}
             </template>
           </el-table-column>
 
@@ -96,7 +96,8 @@
             <el-radio-group v-model="adddataForm.type">
               <el-radio label="1">单选</el-radio>
               <el-radio label="2">多选</el-radio>
-              <el-radio label="3">复选</el-radio>
+              <el-radio label="3">下拉</el-radio>
+              <el-radio label="4">文本</el-radio>
             </el-radio-group>
           </el-form-item>
 
@@ -160,7 +161,8 @@
             <el-radio-group v-model="updataForm.type">
               <el-radio :label="1">单选</el-radio>
               <el-radio :label="2">多选</el-radio>
-              <el-radio :label="3">复选</el-radio>
+              <el-radio :label="3">下拉</el-radio>
+              <el-radio :label="4">文本</el-radio>
             </el-radio-group>
           </el-form-item>
 
@@ -228,8 +230,8 @@
       <el-dialog :title="upvaluetitle" :visible.sync="upvalueFlag" width="800px">
         <el-form :model="upvalueForm" ref="upvalueForm" :rules="rule"  label-width="80px">
 
-          <el-form-item label="序号" prop="id">
-            <el-input v-model="upvalueForm.id" autocomplete="off" ></el-input>
+          <el-form-item label="序号" prop="id" >
+            <el-input v-model="upvalueForm.id" autocomplete="off"  readonly=""></el-input>
           </el-form-item>
 
           <el-form-item label="名称" prop="name">
@@ -349,7 +351,7 @@
           //属性值修改
         upvalue:function(row){
           this.upvalueFlag=true;
-          this.upvaluetitle=row.nameCH+"的修改信息";
+          this.upvaluetitle=row.name+"的修改信息";
           this.$ajax.get("http://localhost:8080/api/datavalue/upShowvalueData?id="+row.id).then(rs=>{
             var upvdata=rs.data.data;
             console.log(rs);
@@ -381,6 +383,7 @@
         },
 
         weihu:function(row){//属性值查询
+
           this.abc=row.id;
           this.row=row;
           this.valueTitle=row.nameCH+"的选项信息";

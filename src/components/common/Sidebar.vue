@@ -62,9 +62,9 @@ export default {
                     title: '系统首页'
                 },
               {
-                icon:"el-icon-platform-eleme",
+                icon:"el-icon-shopping-cart-full",
                 index:"4",
-                title:"商品管理",
+                title:"商品分类管理",
                 subs: [
                   {
                     index: 'Type',
@@ -75,6 +75,9 @@ export default {
                   },{
                     index: 'Data',
                     title: '属性管理'
+                  },{
+                    index: 'Goods',
+                    title: '商品管理'
                   }]
               },
                 {

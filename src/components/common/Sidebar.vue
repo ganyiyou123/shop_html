@@ -77,6 +77,9 @@ export default {
                     title: '属性管理'
                   },{
                     index: 'Goods',
+                    title: '商品新增'
+                  },{
+                    index: 'GoodsDatas',
                     title: '商品管理'
                   }]
               },

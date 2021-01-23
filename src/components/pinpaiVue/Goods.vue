@@ -11,7 +11,7 @@
 
     <!--第一-->
     <div v-if="active==0" >
-    <el-form :model="addFoodsForm" ref="addFoodsForm" label-width="120px"   style="width: 600px" size="small">
+    <el-form :model="addFoodsForm" ref="addFoodsForm" label-width="120px" :rules="rule"    style="width: 600px" size="small">
 
 
 
@@ -80,17 +80,6 @@
 
         <el-form-item v-if="isSKUData.length>0" label="商品规格" prop="name">
           <el-form-item v-for="a in  isSKUData" :key="a.id" :label="a.nameCH">
-
-            <!--  3下拉框    1单选框     2 复选框   4  输入框  -->
-            <!--<el-input v-if="a.type==4"></el-input>
-
-            <el-select v-if="a.type==3" v-model="bbb"  placeholder="请选择">
-              <el-option v-for="b in a.values" :key="b.id"  :label="b.nameCH" :value="b.id"></el-option>
-            </el-select>
-
-            <el-radio-group v-if="a.type==1"  v-model="aaa">
-              <el-radio v-for="b in a.values" :key="b.id" :label="b.nameCH"></el-radio>
-            </el-radio-group>-->
 
               <el-checkbox-group v-if="a.type==2" v-model="a.ckValues"  @change="skuChange">
               <el-checkbox v-for="b in a.values" :key="b.id" :label="b.nameCH" name="type"></el-checkbox>
@@ -201,7 +190,23 @@
             tableShow:false,
 
             stockss:"",
-            pricess:""
+            pricess:"",
+
+            rule:{ //属性新增验证规则
+              name:[
+                { required: true, message: '请输入名称', trigger: 'blur' },
+                { min: 2, max: 15, message: '长度在 2 到 15 个字符', trigger: 'blur' }
+              ],
+              title:[
+                { required: true, message: '请输入名称', trigger: 'blur' },
+                { min: 2, max: 15, message: '长度在 2 到 15 个字符', trigger: 'blur' }
+              ],
+              productdecs:[
+                { required: true, message: '请输入名称', trigger: 'blur' },
+                { min: 2, max: 15, message: '长度在 2 到 15 个字符', trigger: 'blur' }
+              ]
+
+            },
 
 
           }
@@ -314,6 +319,7 @@
                 if(dataDatas[i].isSku==2){
 
                   if(dataDatas[i].type!=4){
+                    dataDatas[i].ckValues=[];
                     this.$ajax.get("http://localhost:8080/api/datavalue/getvalueData?dataId="+dataDatas[i].id).then(rs=>{
                       dataDatas[i].values=rs.data.data;
                       this.noSkuData.push(dataDatas[i]);

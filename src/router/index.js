@@ -42,6 +42,11 @@ export default new Router({
         },{
           path: '/Goods',
           component: () => import(/* webpackChunkName: "dashboard" */ '../components/pinpaiVue/Goods.vue'),
+          meta: { title: '商品新增' }
+        },
+        {
+          path: '/GoodsDatas',
+          component: () => import(/* webpackChunkName: "dashboard" */ '../components/pinpaiVue/GoodsDatas.vue'),
           meta: { title: '商品管理' }
         }
 

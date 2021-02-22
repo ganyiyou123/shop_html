@@ -76,11 +76,21 @@ export default {
                     index: 'Data',
                     title: '属性管理'
                   },{
-                    index: 'Goods',
+                    index: 'Goods2',
                     title: '商品新增'
                   },{
                     index: 'GoodsDatas',
                     title: '商品管理'
+                  }]
+              },
+              {
+                icon:"el-icon-user-cart-full",
+                index:"5",
+                title:"用户管理",
+                subs: [
+                  {
+                    index: 'UserZ',
+                    title: '用户注册'
                   }]
               },
                 {

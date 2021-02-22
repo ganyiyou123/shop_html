@@ -40,8 +40,8 @@ export default new Router({
           component: () => import(/* webpackChunkName: "dashboard" */ '../components/pinpaiVue/Data.vue'),
           meta: { title: '属性管理' }
         },{
-          path: '/Goods',
-          component: () => import(/* webpackChunkName: "dashboard" */ '../components/pinpaiVue/Goods.vue'),
+          path: '/Goods2',
+          component: () => import(/* webpackChunkName: "dashboard" */ '../components/pinpaiVue/Goods2.vue'),
           meta: { title: '商品新增' }
         },
         {
@@ -52,6 +52,10 @@ export default new Router({
 
 
       ]
+    },{
+      path: '/UserZ',
+      component: () => import(/* webpackChunkName: "dashboard" */ '../components/user/UserZ.vue'),
+      meta: { title: '用户登录' }
     }
   ]
 })
